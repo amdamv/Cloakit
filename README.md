@@ -27,7 +27,7 @@
 
 ### 1. Клонируем репозиторий
 ```bash
-git clone https://github.com/yourname/cloak-service.git
+git clone https://github.com/amdamv/cloak-service.git
 cd cloak-service
 ```
 
