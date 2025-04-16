@@ -1,19 +1,20 @@
 version: '3.8'
+
 services:
   api:
-    build: .
+    image: node:18                # используем готовый образ Node.js
+    working_dir: /app
+    volumes:
+      - .:/app                    # монтируем текущую папку внутрь контейнера
+    command: npm run start:dev    # команда запуска твоего NestJS проекта
     ports:
-      - '3000:3000'
+      - '3003:3003'
     depends_on:
       - mongo
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/cloak_db
-    volumes:
-      - .:/app
-    command: npm run start:dev
 
   mongo:
     image: mongo
+    container_name: cloak-mongo
     ports:
       - '27017:27017'
     volumes:

@@ -7,28 +7,26 @@ import { CloakLog } from './schemas/cloak-log.schema';
 
 @Injectable()
 export class CloakService {
-    private readonly suspiciousIps = ['8.8.8.8', '1.1.1.1'];
-    private readonly suspiciousAgents = ['curl', 'python-requests', 'PostmanRuntime'];
-    private readonly blockedCountries = ['KP', 'IR', 'SY'];
     constructor(
         @InjectModel(CloakLog.name)
         private readonly cloakLogModel: Model<CloakLog>
     ) {}
+    private readonly suspiciousIps = ['8.8.8.8', '1.1.1.1'];
+    private readonly suspiciousAgents = ['curl', 'python-requests', 'PostmanRuntime'];
+    private readonly blockedCountries = ['KP', 'IR', 'SY'];
 
-
-    async check(dto: CheckDto): Promise<'bot' | 'not_bot'> {
+    check(dto: CheckDto): 'bot' | 'not_bot' {
         const { ip, userAgent, country } = dto;
 
-        const result =
+        if (
             this.suspiciousIps.includes(ip) ||
             this.blockedCountries.includes(country) ||
             this.suspiciousAgents.some(agent => userAgent.includes(agent))
-                ? 'bot'
-                : 'not_bot';
+        ) {
+            return 'bot';
+        }
 
-        await this.cloakLogModel.create({ ...dto, result });
-
-        return result;
+        return 'not_bot';
     }
 
     async getLogs(limit = 50) {

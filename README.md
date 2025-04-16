@@ -19,7 +19,6 @@
 -  Все запросы логируются в MongoDB
 -  Реализован эндпоинт `/cloak/logs` для просмотра истории
 -  Добавлена документация Swagger для тестирования API
--  Подключён простой HTML клиент `client.html` для ручной демонстрации
 
 ---
 
@@ -37,8 +36,8 @@ docker-compose up --build
 ```
 
 Приложение будет доступно по адресу:  
- `http://localhost:3000` — API  
- `http://localhost:3000/api` — Swagger UI
+ `http://localhost:3003` — API  
+ `http://localhost:3003/api` — Swagger UI
 
 ---
 
@@ -61,9 +60,6 @@ docker-compose up --build
 
 ###  Получение логов
 **GET** `/cloak/logs?limit=10`
-
-**Ответ:** массив последних логов в порядке от новых к старым
-
 
 
 
