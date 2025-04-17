@@ -1,16 +1,21 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsIP } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CheckDto {
-    @IsString()
-    ip: string;
+  @ApiProperty({ example: '193.163.187.238' })
+  @IsIP()
+  ip: string;
 
-    @IsString()
-    userAgent: string;
+  @ApiProperty({ example: 'curl/7.68.0' })
+  @IsString()
+  userAgent: string;
 
-    @IsString()
-    country: string;
+  @ApiProperty({ example: 'UA' })
+  @IsString()
+  country: string;
 
-    @IsOptional()
-    @IsString()
-    os?: string;
+  @ApiProperty({ example: 'MacOS' })
+  @IsOptional()
+  @IsString()
+  os?: string;
 }

@@ -6,12 +6,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-      .setTitle('Cloak Service')
-      .setVersion('1.0')
-      .build();
+    .setTitle('Cloak Service')
+    .setVersion('1.0')
+    .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3003);
+  await app.listen(process.env.PORT || 4000);
+  console.log('MONGO_URL:', process.env.MONGO_URL);
 }
 bootstrap();

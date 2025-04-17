@@ -1,35 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CheckDto } from './dto/check.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { CloakLog } from './schemas/cloak-log.schema';
-
+import { RESULT_BOT, RESULT_NOT_BOT } from './constant';
+import { Parser } from 'json2csv';
+import { CloakLogRepository } from './repo/cloak-log.repository';
 
 @Injectable()
 export class CloakService {
-    constructor(
-        @InjectModel(CloakLog.name)
-        private readonly cloakLogModel: Model<CloakLog>
-    ) {}
-    private readonly suspiciousIps = ['8.8.8.8', '1.1.1.1'];
+  private readonly suspiciousIpMap = new Map<string, boolean>([
+    ['8.8.8.8', true],
+    ['1.1.1.1', true],
+  ]);
+
+  private readonly blockedCountriesMap = new Map<string, boolean>([
+    ['KP', true],
+    ['IR', true],
+    ['SY', true],
+  ]);
+
     private readonly suspiciousAgents = ['curl', 'python-requests', 'PostmanRuntime'];
-    private readonly blockedCountries = ['KP', 'IR', 'SY'];
 
-    check(dto: CheckDto): 'bot' | 'not_bot' {
-        const { ip, userAgent, country } = dto;
+  constructor(private readonly cloakLogRepo: CloakLogRepository) {}
 
-        if (
-            this.suspiciousIps.includes(ip) ||
-            this.blockedCountries.includes(country) ||
-            this.suspiciousAgents.some(agent => userAgent.includes(agent))
-        ) {
-            return 'bot';
-        }
-
-        return 'not_bot';
+    async check(dto: CheckDto): Promise<{ result: boolean }> {
+        const result = this.isBot(dto);
+        await this.cloakLogRepo.save({ ...dto, result });
+        return { result };
     }
 
-    async getLogs(limit = 50) {
-        return this.cloakLogModel.find().sort({ createdAt: -1 }).limit(limit).exec();
+    private isBot(dto: CheckDto): boolean {
+        const { ip, userAgent, country } = dto;
+        if (
+            this.suspiciousIpMap.has(ip) ||
+            this.blockedCountriesMap.has(country) ||
+            this.suspiciousAgents.some(agent => userAgent.includes(agent))
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    async exportLogs(limit = 1000, offset = 0): Promise<string> {
+        const logs = await this.cloakLogRepo.findAll(limit, offset);
+        const Parser = (await import('json2csv')).Parser;
+        const parser = new Parser({ fields: ['ip', 'userAgent', 'country', 'os', 'result', 'createdAt'] });
+        return parser.parse(logs);
+    }
+
+    async getLogs(limit = 20, offset = 0) {
+        return this.cloakLogRepo.findAll(limit, offset);
     }
 }
