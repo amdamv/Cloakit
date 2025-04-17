@@ -1,24 +1,13 @@
-#  Cloak Service для фильтрации ботов
+#  Cloak - Service
 
 ---
 
-##  Используемые технологии
+## Стек
 
-- NestJS+ TypeScript
-- MongoDB+ mongoose
-- Docker/Docker Compose
-- Swagger (`@nestjs/swagger`)
-- class-validator/ DTOs
-
-
-## Выполненные шаги
-
--  Настроен проект на NestJS с подключением к MongoDB через Docker Compose
--  Реализован эндпоинт `/cloak/check` с определением "бот" / "не бот"
--  Реализована логика фильтрации по IP, User-Agent, стране и ОС
--  Все запросы логируются в MongoDB
--  Реализован эндпоинт `/cloak/logs` для просмотра истории
--  Добавлена документация Swagger для тестирования API
+- NestJS
+- MongoDB + Mongoose
+- Docker + docker-compose
+- Swagger
 
 ---
 
@@ -36,8 +25,8 @@ docker-compose up --build
 ```
 
 Приложение будет доступно по адресу:  
- `http://localhost:3003` — API  
- `http://localhost:3003/api` — Swagger UI
+ `http://localhost:4000` — API  
+ `http://localhost:4000/api` — Swagger UI
 
 ---
 
@@ -47,19 +36,27 @@ docker-compose up --build
 **POST** `/cloak/check`
 ```json
 {
-  "ip": "8.8.8.8",
-  "userAgent": "curl/7.68.0",
-  "country": "UA",
-  "os": "Linux"
+ "ip": "193.163.187.238",
+ "userAgent": "Chrome 134 on macOS (Sequoia)",
+ "country": "KP",
+ "os": "macOS"
 }
 ```
 **Ответ:**
 ```json
-{ "result": "bot" }
+{ "result": "true" } 
 ```
 
 ###  Получение логов
-**GET** `/cloak/logs?limit=10`
+**GET** `http://localhost:4000/cloak/logs`
+
+**GET** `http://localhost:4000/cloak/logs?limit=10`
+
+
+### Фильтрация (MVP)
+ -Подозрительные IP: 8.8.8.8, 1.1.1.1
+ -Заблокированные страны: KP, IR, SY
+ -Подозрительные UserAgent: curl, python-requests, PostmanRuntime
 
 
 
