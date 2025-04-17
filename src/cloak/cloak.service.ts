@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CheckDto } from './dto/check.dto';
-import { RESULT_BOT, RESULT_NOT_BOT } from './constant';
-import { Parser } from 'json2csv';
 import { CloakLogRepository } from './repo/cloak-log.repository';
 
 @Injectable()
